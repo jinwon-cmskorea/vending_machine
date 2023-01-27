@@ -19,20 +19,4 @@ class Cola extends InfoDrink {
      * @var int
      */
     protected $_price = 1000;
-    
-    /**
-     * 부모 메소드를 public 으로 바꿔서 호출
-     * @return number
-     */
-    public function getProductNum() {
-        return parent::_getProductNum();
-    }
-    
-    /**
-     * 부모 메소드를 public 으로 바꿔서 호출
-     * @return number
-     */
-    public function getPrice() {
-        return parent::_getPrice();
-    }
 }

@@ -20,7 +20,7 @@ class InfoDrink {
      * @return int
      */
     
-    protected function _getProductNum() {
+    public function getProductNum() {
         return $this->_productNum;
     }
     
@@ -28,7 +28,7 @@ class InfoDrink {
      * @brief 상품 가격을 가져오는 메소드
      * @return int
      */
-    protected function _getPrice() {
+    public function getPrice() {
         return $this->_price;
     }
 }

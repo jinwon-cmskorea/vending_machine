@@ -8,15 +8,7 @@ require_once __DIR__ . '/../library/InfoDrink.php';
  * InfoDrink 테스트를 위한 클래스
  * InfoDrinkTestClass
  */ 
-class InfoDrinkTestClass extends InfoDrink {
-    public function getProductNum() {
-        return parent::_getProductNum();
-    }
-    
-    public function getPrice() {
-        return parent::_getPrice();
-    }
-};
+class InfoDrinkTestClass extends InfoDrink { };
 
 class ColaTestClass extends InfoDrinkTestClass {
     protected $_productNum = 0;
