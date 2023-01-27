@@ -2,7 +2,7 @@
 /**
  * 음료수 정보 클래스
  */
-class InfoDrink {
+abstract class InfoDrink {
     /**
      * 상품 번호
      * @var int
