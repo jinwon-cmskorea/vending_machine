@@ -21,10 +21,6 @@ class DispenserTestClass extends Dispenser {
         parent::__construct($maxStock);
     }
     
-    public function giveCharge() {
-        return parent::_giveCharge();
-    }
-    
     public function giveCoins($money) {
         return parent::_giveCoins($money);
     }
@@ -60,21 +56,17 @@ class DispenserTestClass extends Dispenser {
     public function setRemainCharge($changeCharge) {
         $this->_remainCharge = $changeCharge;
     }
+    
+    public function insertAllMoney($productNum, $count) {
+        $this->_allMoney += $this->_infoDrinks[$productNum] * $count;
+    }
 };
 
 /**
  * InfoDrink 테스트를 위한 클래스
  * InfoDrinkTestClass
  */
-class InfoDrinkTestClass extends InfoDrink {
-    public function getProductNum() {
-        return parent::_getProductNum();
-    }
-    
-    public function getPrice() {
-        return parent::_getPrice();
-    }
-};
+class InfoDrinkTestClass extends InfoDrink {};
 
 class ColaTestClass extends InfoDrinkTestClass {
     protected $_productNum = 0;
@@ -163,24 +155,14 @@ class DispenserTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * Tests Dispenser->_giveCharge()
-     */
-    public function testGiveCharge() {
-        $this->dispenser->insertMoney(3000);
-        $this->dispenser->selectProduct($this->cola->getProductNum(), 2);
-        $res = $this->dispenser->giveCharge();
-        $this->assertEquals(1000, $res);
-    }
-    
-    /**
      * Tests Dispenser->_giveCoins()
      */
     public function testGiveCoins() {
         $this->dispenser->insertMoney(3000);
-        $this->dispenser->selectProduct($this->cola->getProductNum(), 2);
+        $this->dispenser->insertAllMoney($this->cola->getProductNum(), 2);
         
         $expect1 = "1000 원 1 개 반환되었습니다.";
-        $this->assertEquals($expect1, $this->dispenser->giveCoins($this->dispenser->giveCharge()));
+        $this->assertEquals($expect1, $this->dispenser->giveCoins($this->dispenser->getInsertedmoney() - $this->dispenser->getAllMoney()));
         $remainCoins = $this->dispenser->getRemainCharge();
         $this->assertEquals(9, $remainCoins['1000']);
         
@@ -206,10 +188,10 @@ class DispenserTest extends PHPUnit_Framework_TestCase {
         $user = new User(Dispenser::ADMIN);
         $testDis->fillProduct($this->sprite->getProductNum(), 5, $user->getRole());
         $testDis->insertMoney(2000);
-        $testDis->selectProduct($this->sprite->getProductNum(), 2);
+        $testDis->insertAllMoney($this->sprite->getProductNum(), 2);
         
         $expect = "반환할 거스름 돈이 부족합니다. 투입금액 2000 원이 반환되었습니다.";
-        $this->assertEquals($expect, $testDis->giveCoins($testDis->giveCharge()));
+        $this->assertEquals($expect, $testDis->giveCoins($testDis->getInsertedmoney() - $testDis->getAllMoney()));
         $remainStock = $testDis->getRemainStock();
         $this->assertEquals(5, $remainStock[$this->sprite->getProductNum()]);//주문이 취소됐으므로 재고도 되돌려져야함
         
@@ -406,17 +388,6 @@ class DispenserTest extends PHPUnit_Framework_TestCase {
         
         $res2 = $this->dispenser->isAdmin('USER');
         $this->assertFalse($res2);
-    }
-    
-    /**
-     * Tests Dispenser->selectProduct()
-     */
-    public function testSelectProduct() {
-        $res1 = $this->dispenser->selectProduct($this->cola->getProductNum(), 2);
-        $this->assertEquals(2000, $res1);
-        
-        $res2 = $this->dispenser->selectProduct($this->sprite->getProductNum(), 3);
-        $this->assertEquals(4400, $res2);
     }
     
     /**

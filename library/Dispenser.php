@@ -42,9 +42,14 @@ class Dispenser {
     const USER = "USER";
     /**
      * 사용하는 거스름돈
-     * @var string
+     * @var array
      */
     const ALLOW_GIVES = array('1000', '500', '100');
+    /**
+     * 초기값 설정
+     * @var int
+     */
+    const INIT_CHARGE = 10;
     /**
      * 남은 거스름돈 동전 갯수
      * @var array
@@ -102,14 +107,14 @@ class Dispenser {
         //입력받은 최대 재고량만큼 설정
         $this->_maxStock = $maxStock;
         //재고를 채우지 않았으므로 초기값 0으로 설정
-        for ($i = 0; $i < count($maxStock); $i++) {
-            $this->_remainStock[$i] = 0;
+        foreach ($maxStock as $key => $value) {
+            $this->_remainStock[$key] = 0;
         }
         //초기 거스름돈 설정
         $this->_remainCharge = array(
-            '1000'  => 10,
-            '500'   => 10,
-            '100'   => 10
+            '1000'  => self::INIT_CHARGE,
+            '500'   => self::INIT_CHARGE,
+            '100'   => self::INIT_CHARGE
         );
         
         $cola = new Cola();
@@ -121,21 +126,6 @@ class Dispenser {
             $sprite->getProductNum()    => $sprite->getPrice(),
             $juice->getProductNum()     => $juice->getPrice()
         );
-    }
-    
-    /**
-     * 거스름돈을 반환하는 메소드
-     * 
-     * @return int
-     */
-    protected function _giveCharge() {
-        return $this->_insertedMoney - $this->_allMoney;
-        
-        /*
-         * 매개변수 $money는 필요없어보임
-         * 또한 외부에서 값을 계산 후 그냥 출력해주는 게 아니라
-         * 메소드에서 계산 후 거스름 돈을 출력하는게 맞는 동작일듯
-         */
     }
     
     /**
@@ -157,7 +147,7 @@ class Dispenser {
         
         foreach ($this->_remainCharge as $key => $value) {
             //$key 값 지폐,코인 몇개 반환해줘야하는 지 확인
-            $temp = ($money - ($money % $key)) / $key;
+            $temp = (int)floor($money / $key);
             //남아있는 거스름돈 보다 반환 갯수가 많은 경우, 남아있는 거스름돈 먼저 전부 반환
             if ($temp >= $this->_remainCharge[$key]) {
                 $remain = $this->_remainCharge[$key];
@@ -307,24 +297,6 @@ class Dispenser {
     }
     
     /**
-     * 상품을 선택 후, 내야할 돈 계산
-     * 
-     * @param int $productNum 상품 번호
-     * @param int $count 상품갯수
-     * @return int
-     */
-    public function selectProduct($productNum, $count) {
-        $this->_allMoney += $this->_infoDrinks[$productNum] * $count;
-        
-        return $this->_allMoney;
-        /*
-         * 상속받은 클래스를 Dispenser 에서 호출해야하는데
-         * 상속받는 음료스 클래스 파일을 따로 만들고 호출해줘야 하는지 알아봐야함
-         * -> 팀장님께서 클래스 파일을 따로 만드는 게 맞고, 이를 선언해줘야 한다고 조언해주심
-         */
-    }
-    
-    /**
      * 입력된 상수에 따라 경고문을 출력하는 메소드
      * 
      * @param const string $status
@@ -359,10 +331,10 @@ class Dispenser {
         } else {
             $res = $productNum . " 상품을 " . $count . " 만큼 주문하셨습니다.\n";
             $this->_remainStock[$productNum] -= $count;
-            $this->selectProduct($productNum, $count);
+            $this->_allMoney += $this->_infoDrinks[$productNum] * $count;
             
             //상품 하나를 주문하면 바로 거스름돈 반환
-            $res .= $this->_giveCoins($this->_giveCharge());
+            $res .= $this->_giveCoins($this->_insertedMoney - $this->_allMoney);
             //만약 반환할 거스름돈이 부족하다면 주문한 상품 재고를 되돌림
             if (strrpos($res, "부족합니다.")) {
                 $this->_remainStock[$productNum] += $count;
