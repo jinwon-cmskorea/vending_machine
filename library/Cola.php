@@ -9,13 +9,13 @@ require_once __DIR__ .  '/InfoDrink.php';
  */
 class Cola extends InfoDrink {
     /**
-     * @brief 상품 번호
+     * 상품 번호
      * @var int
      */
     protected $_productNum = 0;
     
     /**
-     * @brief 상품 가격
+     * 상품 가격
      * @var int
      */
     protected $_price = 1000;

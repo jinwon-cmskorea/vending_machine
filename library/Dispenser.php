@@ -279,7 +279,7 @@ class Dispenser {
     }
     
     /**
-     * @brief 관리자인지 확인하는 메소드
+     * 관리자인지 확인하는 메소드
      * 
      * @param string $role 사용자의 역할
      * @return boolean
